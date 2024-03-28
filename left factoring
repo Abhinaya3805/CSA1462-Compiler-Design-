@@ -1,59 +1,31 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-void eliminateLeftFactoring(char production[], char nonTerminal) {
-    printf("\nOriginal Production:\n%s\n", production);
-
-    int length = strlen(production);
-    int i = 0, j = 0;
-
-    while (production[i] != '|') {
-        i++;
+#include<stdio.h>
+#include<string.h>
+int main()
+{
+    char input[100],l[50],r[50],temp[10],tempprod[20],productions[25][50];
+    int i=0,j=0,flag=0,consumed=0;
+    printf("Enter the productions: ");
+    scanf("%1s->%s",l,r);
+    printf("%s",r);
+    while(sscanf(r+consumed,"%[^|]s",temp) == 1 && consumed <= strlen(r))  
+	{
+        if(temp[0] == l[0])  
+		{
+            flag = 1;
+            sprintf(productions[i++],"%s'->%s%s'\0",l,temp+1,l);
+        }
+        else
+            sprintf(productions[i++],"%s->%s%s'\0",l,temp,l);
+        consumed += strlen(temp)+1;
     }
-
-    int commonPrefixLength = 0;
-    while (production[j] == production[i]) {
-        commonPrefixLength++;
-        j++;
-        i++;
+    if(flag == 1)  
+	{
+        sprintf(productions[i++],"%s'->e\0",l);
+        printf("The productions after eliminating Left Recursion are:\n");
+        for(j=0;j<i;j++)
+            printf("%s\n",productions[j]);
     }
-
-    if (commonPrefixLength == 0) {
-        printf("\nNo Left Factoring\n");
-        return;
-    }
-
-    char newNonTerminal = 'A';
-    while (nonTerminal == newNonTerminal || strchr(production + i, newNonTerminal) != NULL) {
-        newNonTerminal++;
-    }
-
-    char prefix[commonPrefixLength + 2];
-    strncpy(prefix, production, commonPrefixLength);
-    prefix[commonPrefixLength] = '\0';
-
-    char newProduction[100];
-    sprintf(newProduction, "%c'->%s%c|\u03B5", nonTerminal, prefix, newNonTerminal);
-    printf("\nUpdated Production:\n%s\n", newProduction);
-
-    i = 0;
-    while (production[i] != '|') {
-        i++;
-    }
-
-    memmove(production + commonPrefixLength, production + i + 1, length - i - commonPrefixLength + 1);
-    production[length - commonPrefixLength] = newNonTerminal;
-    printf("\nUpdated Production after eliminating left factoring:\n%s\n", production);
-}
-
-int main() {
-    char production[100] = "S->abS|abCd|ef";
-    char nonTerminal = 'S';
-
-    eliminateLeftFactoring(production, nonTerminal);
-
+    else
+        printf("The Given Grammar has no Left Recursion");
     return 0;
 }
-output:
-s->abS|abcd|ef
